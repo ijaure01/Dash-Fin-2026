@@ -1,3 +1,4 @@
-plotly
+streamlit>=1.31.0
 pandas
-streamlit
+plotly
+altair<5
