@@ -1,0 +1,4 @@
+It is necessary to have installed the next packages:
+- plotly
+- pandas
+- streamlit
