@@ -91,41 +91,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. PLOTLY ESTILOA (URREA ETA MUTED COLOURS) ---
-PALETA_ELITE = ["#3d5a80", "#c9a050", "#98c1d9", "#566d7e", "#293241"]
 
-def style_fig_elite(fig):
-    fig.update_layout(
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        font=dict(color="white", size=12),
-        legend = dict (
-            title = None,
-            font = dict(color = "#FFFFFF", size = 14)
-        ),
-        margin=dict(t=30, b=10, l=10, r=10),
-        colorway=PALETA_ELITE
-    )
-    # X ARDATZA (Datak, Kategoriak...)
-    fig.update_xaxes(
-        title = None,
-        tickfont=dict(color="#FFFFFF", size=11), # Zenbaki/Testu guztiak zuriz
-        #titlefont=dict(color="#FFFFFF"),
-        gridcolor='#3d4654', 
-        zeroline=False,
-        showgrid=True
-    )
-    
-    # Y ARDATZA (Diru kopuruak...)
-    fig.update_yaxes(
-        title = None,
-        tickfont=dict(color="#FFFFFF", size=11), # Zenbaki guztiak zuriz
-        #titlefont=dict(color="#FFFFFF"),
-        gridcolor='#3d4654', 
-        zeroline=False,
-        showgrid=True
-    )
-    return fig
 
 
 # --- 2. HIZKUNTZA ETA HIZTEGIA ---
@@ -197,11 +163,39 @@ if df is not None:
     df_filtratua = df[(df['Data'].dt.year == urte_aukera) & (df['Month_Name'].isin(hila_aukerak))]
 
     # --- 5. GRAFIKOAK (LEHENGO ESTILOA) ---
+    PALETA_ELITE = ["#3d5a80", "#c9a050", "#98c1d9", "#566d7e", "#293241"]
+
     def style_fig_elite(fig):
-        fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-                          font=dict(color="white"), margin=dict(t=30, b=10, l=10, r=10))
-        fig.update_xaxes(showgrid=True, gridcolor='#3d4654', title=None)
-        fig.update_yaxes(showgrid=True, gridcolor='#3d4654', title=None)
+        fig.update_layout(
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color="white", size=12),
+            legend = dict (
+                title = None,
+                font = dict(color = "#FFFFFF", size = 14)
+            ),
+            margin=dict(t=30, b=10, l=10, r=10),
+            colorway=PALETA_ELITE
+        )
+        # X ARDATZA (Datak, Kategoriak...)
+        fig.update_xaxes(
+            title = None,
+            tickfont=dict(color="#FFFFFF", size=11), # Zenbaki/Testu guztiak zuriz
+            #titlefont=dict(color="#FFFFFF"),
+            gridcolor='#3d4654', 
+            zeroline=False,
+            showgrid=True
+        )
+        
+        # Y ARDATZA (Diru kopuruak...)
+        fig.update_yaxes(
+            title = None,
+            tickfont=dict(color="#FFFFFF", size=11), # Zenbaki guztiak zuriz
+            #titlefont=dict(color="#FFFFFF"),
+            gridcolor='#3d4654', 
+            zeroline=False,
+            showgrid=True
+        )
         return fig
 
     st.title(f"{t['titulua']}: {urte_aukera}")
@@ -222,15 +216,24 @@ if df is not None:
     col_left, col_right = st.columns(2)
     with col_left:
         st.subheader(t['banaketa'])
-        fig_pie = px.pie(df_filtratua, values='Kopurua', names='Kategoria', hole=0.5, color_discrete_sequence=px.colors.qualitative.Pastel)
-        fig_pie.update_traces(textinfo='none')
+        fig_pie = px.pie(df_filtratua, values='Kopurua', names='Kategoria', hole=0.5)
+        fig_pie.update_traces(
+            textinfo='none',
+            marker=dict(line=dict(color='#262C38', width=2))
+        )
         st.plotly_chart(style_fig_elite(fig_pie), use_container_width=True)
 
     with col_right:
         st.subheader(t['bilakaera'])
         df_daily = df_filtratua.groupby('Data')['Kopurua'].sum().reset_index()
         fig_line = px.line(df_daily, x='Data', y='Kopurua', markers=True)
-        fig_line.update_traces(line_color='#c9a050', fill='tozeroy', fillcolor='rgba(201, 160, 80, 0.1)')
+        # Behartu urrezko lerroa eta puntuak
+        fig_line.update_traces(
+            line_color = '#c9a050',
+            fill = 'tozeroy',
+            fillcolor = 'rgba(201, 160, 80, 0.2)', 
+            marker=dict(size=8)
+        )
         st.plotly_chart(style_fig_elite(fig_line), use_container_width=True)
 
     # Top 5 atala
